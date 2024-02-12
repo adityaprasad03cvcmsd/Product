@@ -5,7 +5,7 @@ Backend of the product app in Springboot with POST, PUT, GET and DELETE requests
 # Installation
 To run the code run the file ProductApplication.java file, it runs on port 8001.
 
-# Curls and Response
+# Curls
 
 to create product </br>
 ```
