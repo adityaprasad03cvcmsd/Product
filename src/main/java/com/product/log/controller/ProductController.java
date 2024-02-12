@@ -1,10 +1,13 @@
 package com.product.log.controller;
 
 import com.product.log.dto.CustomResponse;
+import com.product.log.dto.DiscountOrTax;
 import com.product.log.dto.ProductRequest;
 import com.product.log.model.Product;
+import com.product.log.service.DiscountOrTaxService;
 import com.product.log.service.ProductService;
 import jakarta.el.PropertyNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private DiscountOrTaxService discountOrTaxService;
 
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody ProductRequest productRequest){
@@ -120,6 +126,33 @@ public class ProductController {
             customResponse.setMessage("Something went wrong, please try after sometime");
 
             return ResponseEntity.internalServerError().body(customResponse);
+        }
+    }
+
+    @PatchMapping("/discount-tax")
+    public ResponseEntity<?> applyDiscountOrTax(@RequestBody DiscountOrTax discountOrTax) {
+        CustomResponse customResponse = new CustomResponse();
+        try{
+            Product product = discountOrTaxService.applyDiscountOrTaxOnProduct(discountOrTax);
+
+            customResponse.setSuccess(true);
+            customResponse.setMessage("discount or tax applied");
+            customResponse.setData(product);
+
+            return ResponseEntity.ok(customResponse);
+        } catch(PropertyNotFoundException e){
+
+            customResponse.setSuccess(false);
+            customResponse.setMessage("Product not found");
+
+            return ResponseEntity.badRequest().body(customResponse);
+        }
+        catch (BadRequestException e){
+
+            customResponse.setSuccess(false);
+            customResponse.setMessage(e.getMessage());
+
+            return ResponseEntity.badRequest().body(customResponse);
         }
     }
 }
